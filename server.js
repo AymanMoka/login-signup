@@ -20,6 +20,7 @@ mongoose.connect(
     console.log("Database connected");
   }
 );
+app.use("/public/uploads", express.static(__dirname + "/public/uploads"));
 
 app.get("/", (req, res) => {
   res.send("hello from simple server :)");
@@ -27,6 +28,8 @@ app.get("/", (req, res) => {
 
 const authRoute = require("./routes/authRoute");
 app.use("/api/", authRoute); //auth middleware
+
+
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

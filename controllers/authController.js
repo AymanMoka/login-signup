@@ -5,6 +5,7 @@ const Jwt = require("jsonwebtoken");
 const HttpCodes = require("http-status-codes");
 module.exports = {
   async register(req, res) {
+    console.log(req.file);
     const userSchema = Joi.object({
       firstName: Joi.string()
         .required()
@@ -33,7 +34,18 @@ module.exports = {
         .required()
         .valid(Joi.ref("password"))
         .messages({ "any.only": "Password must matching" }),
+      photo: Joi.string(),
     });
+
+    if (!req.file) {
+      return res.status(HttpCodes.StatusCodes.CONFLICT).json({
+        success: false,
+        message: "No Image Found",
+      });
+    }
+
+    const filename = req.file.filename;
+    const base = `${req.protocol}://${req.get("host")}/public/uploads/`;
 
     const { value, error } = userSchema.validate(req.body); //validate schema with req body
     if (error) {
@@ -75,6 +87,7 @@ module.exports = {
         password: hashed,
         username: req.body.username,
         phone: req.body.phone,
+        photo: `${base}${filename}`,
       };
 
       User.create(newUser)
